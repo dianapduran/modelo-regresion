@@ -1,0 +1,59 @@
+proyecto_ingresos/
+│
+├── data/
+│   └── ingresos.txt                  # Dataset original
+│
+├── notebooks/
+│   └── exploracion.ipynb             # Notebook de EDA (estadísticas, gráficos, etc.)
+│
+├── src/                              # Código fuente reutilizable
+│   ├── preprocessing.py              # Limpieza de datos + pipeline
+│   ├── model.py                      # Función que crea ElasticNet con parámetros
+│   ├── train.py                      # Entrena un modelo fijo
+│   ├── optuna_train.py               # Entrena con Optuna + MLflow
+│   └── load_best_model.py            # Carga el mejor modelo desde MLflow
+│
+├── api/                              # Servicio FastAPI
+│   ├── main.py                       # API con endpoint /predecir
+│   └── input_schema.py               # Pydantic: validación de entrada
+│
+├── mlruns/                           # Carpeta automática creada por MLflow
+│
+├── requirements.txt                  # Librerías necesarias (pip install -r ...)
+├── Dockerfile                        # Empaqueta todo en una imagen
+├── docker-compose.yaml               # Levanta API + MLflow UI
+├── README.md                         # Explicación del proyecto
+└── venv/                             # Entorno virtual local (opcional)
+
+🔍explicación carpetas:
+
+data/	Tu dataset original
+notebooks/	EDA: análisis visual y pruebas exploratorias
+
+src/preprocessing.py	Limpieza, imputación, escalado → usado en todo el flujo
+
+src/model.py	Función que devuelve un ElasticNet con hiperparámetros
+
+src/train.py	Entrenamiento simple, manual (sin Optuna)
+
+src/optuna_train.py	Usa Optuna para probar modelos y registra en MLflow
+
+src/load_best_model.py	Carga el mejor modelo desde MLflow para usarlo en la API
+
+api/main.py	Define el endpoint /predecir con FastAPI
+
+api/input_schema.py	Usa Pydantic para validar los datos de entrada JSON
+
+mlruns/	Auto: registros de MLflow (no editás nada ahí)
+
+Dockerfile	Crea imagen con modelo + API listos para producción
+
+docker-compose.yaml	Corre API y MLflow UI al mismo tiempo
+
+
+
+
+
+
+
+

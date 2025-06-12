@@ -1,0 +1,37 @@
+En esta actividad final aplicaremos todos los conceptos abordados a lo largo de las 5 sesiones del curso, incluyendo Machine Learning, MLflow, Optuna y FastAPI. Los objetivos son los siguientes:
+
+Preparación de datos
+
+A partir del dataset provisto (ingresos.txt), y utilizando scikit-learn, realizar un tratamiento adecuado de los datos: revisión de valores nulos, imputación y estandarización de variables numéricas.
+
+Construcción del pipeline
+
+Crear un pipeline que integre de forma automatizada todas las etapas anteriores del preprocesamiento.
+
+Optimización de hiperparámetros con Optuna
+
+Utilizar Optuna para encontrar la mejor combinación de hiperparámetros para un modelo ElasticNet. Puedes utilizar como base el siguiente fragmento dentro de la función objetivo, la cual deberá minimizar el RMSE:
+
+    alpha = trial.suggest_float("alpha", 1e-4, 10.0, log=True)
+
+    l1_ratio = trial.suggest_float("l1_ratio", 0.0, 1.0)
+
+    fit_intercept = trial.suggest_categorical("fit_intercept", [True, False])
+
+Registro del modelo en MLflow
+
+Una vez encontrado el mejor modelo, deberá ser registrado en MLflow para su posterior uso en producción.
+
+Despliegue mediante FastAPI
+
+Crear un servicio con FastAPI que permita consumir el modelo desde un endpoint. Finalmente, desarrollar un pequeño script en Python que envíe una solicitud POST con los siguientes datos y reciba como respuesta el valor de la predicción:
+
+    {
+
+      "edad": 35,
+
+      "nivel_educativo": "universidad",
+
+      "horas_trabajadas": 42.5
+
+    }
