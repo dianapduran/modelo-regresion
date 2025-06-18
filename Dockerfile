@@ -1,21 +1,22 @@
-# Usa Python base
+# Usa Python oficial
 FROM python:3.11-slim
 
 # Crea carpeta de trabajo
 WORKDIR /app
 
-# Copia todo el proyecto (código + mlruns)
+# Copia todo (código + model)
 COPY . .
 
 # Instala dependencias
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Expone puerto de FastAPI
+# Expone puerto
 EXPOSE 8000
 
-# Comando para correr FastAPI
+# Ejecuta FastAPI
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
 
 
 #abrir docker

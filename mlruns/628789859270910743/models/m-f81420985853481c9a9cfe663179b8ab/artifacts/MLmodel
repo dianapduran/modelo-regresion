@@ -1,0 +1,22 @@
+artifact_path: file:///d:/OneDrive%20-%20Landers/Documentos/Curso%20Python/parte_2/Sln_PublicarModelodeRegresion/mlruns/628789859270910743/models/m-f81420985853481c9a9cfe663179b8ab/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.0
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.0
+mlflow_version: 3.1.0
+model_id: m-f81420985853481c9a9cfe663179b8ab
+model_size_bytes: 2621
+model_uuid: m-f81420985853481c9a9cfe663179b8ab
+prompts: null
+run_id: ebed314875804f4b9b4d1df47883304b
+utc_time_created: '2025-06-18 21:09:20.003306'

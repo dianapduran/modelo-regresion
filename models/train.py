@@ -1,91 +1,89 @@
-# Librerías estándar
-import os  # Manejo de rutas y archivos
+# models/train.py
 
-# Librerías de terceros
-import pandas as pd  # Para manejar DataFrames
-from sklearn.model_selection import train_test_split  # Para dividir datos
-from sklearn.metrics import mean_squared_error  # Para evaluar error del modelo
-import optuna  # Para optimizar hiperparámetros automáticamente
-import mlflow  # Para registrar experimentos
-import mlflow.sklearn  # Para registrar modelos sklearn en MLflow
+# --- Librerías estándar ---
+import os                # Para rutas y carpetas
+import joblib            # Para guardar el modelo en archivo .pkl (portátil)
 
-# Librerías locales 
-from models.pipeline import build_pipeline  # Función que crea el pipeline de preprocesamiento + modelo
+# --- Librerías de terceros ---
+import pandas as pd                      # Para manipular datos tabulares
+from sklearn.model_selection import train_test_split  # Para dividir datos en train/test
+from sklearn.metrics import mean_squared_error        # Para evaluar el modelo
+import optuna                              # Para optimizar hiperparámetros
+import mlflow                              # Para registrar experimentos
+import mlflow.sklearn                      # Para registrar modelos sklearn en MLflow
 
-# Rutas de carpetas y archivo
-BASE_DIR = r'd:\OneDrive - Landers\Documentos\Curso Python\parte_2\Sln_PublicarModelodeRegresion'
-DATA_DIR = os.path.join(BASE_DIR, "data")
-INGRESOS_FILE = "ingresos.txt"
-INGRESOS_PATH = os.path.join(DATA_DIR, INGRESOS_FILE)
+# --- Librerías locales ---
+from models.pipeline import build_pipeline  # Tu función personalizada para armar el pipeline
 
-# Función para cargar datos
+# --- Definir rutas importantes ---
+BASE_DIR = os.getcwd()                      # Carpeta raíz del proyecto (carpeta actual)
+DATA_DIR = os.path.join(BASE_DIR, "data")   # Carpeta donde están los datos
+MODEL_DIR = os.path.join(BASE_DIR, "model") # Carpeta para guardar modelo final
+os.makedirs(MODEL_DIR, exist_ok=True)       # Crea la carpeta /model si no existe
+
+INGRESOS_PATH = os.path.join(DATA_DIR, "ingresos.txt")  # Ruta completa del archivo de datos
+
+# --- Función para cargar datos ---
 def cargar_datos(path=INGRESOS_PATH, sep=","):
-    # Verifica que el archivo exista
     if not os.path.isfile(path):
         raise FileNotFoundError(f"Archivo no encontrado: {path}")
-    # Lee el archivo CSV y devuelve un DataFrame
-    return pd.read_csv(path, sep=sep)
+    return pd.read_csv(path, sep=sep)  # Lee CSV y lo devuelve como DataFrame
 
-# Bloque principal
+# --- Bloque principal ---
 if __name__ == "__main__":
-    # Cambia la carpeta de trabajo para evitar errores de rutas
-    os.chdir(BASE_DIR)
+    os.chdir(BASE_DIR)   # Asegura que la carpeta de trabajo sea la raíz del proyecto
 
-    # Carga los datos del archivo CSV
+    # Cargar datos
     data = cargar_datos()
 
-    # Separa variables independientes (X) y dependiente (y)
+    # Separar variables predictoras (X) y variable objetivo (y)
     X = data[['edad', 'nivel_educativo', 'horas_trabajadas']]
     y = data[['ingreso_mensual']]
 
-    # Divide en entrenamiento y prueba (70% train, 30% test por defecto)
+    # Dividir datos en entrenamiento y prueba
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 
-    # Construye el pipeline de ingeniería de características + modelo
+    # Construir pipeline con transformaciones + modelo ElasticNet
     pipeline = build_pipeline()
 
-    # Define o crea un experimento en MLflow para guardar todos los runs
+    # Crear experimento en MLflow (o usarlo si existe)
     mlflow.set_experiment("ElasticNet_optuna")
 
-    # Función objetivo de Optuna: prueba diferentes hiperparámetros
- 
+    # --- Definir función objetivo para Optuna ---
     def objective(trial):
-        # Define rangos para alpha, l1_ratio, fit_intercept
+        # Sugerir valores para hiperparámetros dentro de rangos
         alpha = trial.suggest_float("alpha", 1e-4, 10.0, log=True)
         l1_ratio = trial.suggest_float("l1_ratio", 0.0, 1.0)
         fit_intercept = trial.suggest_categorical("fit_intercept", [True, False])
 
-        # Aplica esos valores al pipeline
+        # Aplicar esos valores al pipeline
         pipeline.set_params(
             regressor__alpha=alpha,
             regressor__l1_ratio=l1_ratio,
             regressor__fit_intercept=fit_intercept
         )
 
-        # Entrena el modelo con esos hiperparámetros
+        # Entrenar modelo con train set
         pipeline.fit(X_train, y_train)
 
-        # Predice en los datos de prueba
+        # Predecir en test set y calcular error (RMSE)
         y_pred = pipeline.predict(X_test)
-
-        # Calcula RMSE (raíz del error cuadrático medio)
         rmse = mean_squared_error(y_test, y_pred) ** 0.5
 
-        # Registra los parámetros y el resultado en MLflow
+        # Registrar run en MLflow (anidado)
         with mlflow.start_run(nested=True):
             mlflow.log_param("alpha", alpha)
             mlflow.log_param("l1_ratio", l1_ratio)
             mlflow.log_param("fit_intercept", fit_intercept)
             mlflow.log_metric("rmse", rmse)
 
-        # Retorna RMSE (el mejor es el menor rmse)
-        return rmse
+        return rmse  # Retornar el error para que Optuna lo minimice
 
-    # Ejecuta Optuna para encontrar los mejores hiperparámetros
-    study = optuna.create_study(direction='minimize')  # Minimizar RMSE
-    study.optimize(objective, n_trials=50)  # Probar 50 combinaciones
+    # --- Ejecutar búsqueda Optuna (50 pruebas) ---
+    study = optuna.create_study(direction="minimize")
+    study.optimize(objective, n_trials=50)
 
-    # Reentrena con los mejores hiperparámetros encontrados
+    # --- Entrenar modelo final con los mejores hiperparámetros ---
     pipeline.set_params(
         regressor__alpha=study.best_params['alpha'],
         regressor__l1_ratio=study.best_params['l1_ratio'],
@@ -93,9 +91,13 @@ if __name__ == "__main__":
     )
     pipeline.fit(X_train, y_train)
 
-    # Guarda el modelo final entrenado en MLflow
+    # Registrar el modelo final en MLflow
     with mlflow.start_run(run_name="Best_Model"):
-        mlflow.sklearn.log_model(pipeline, "model")  # Guarda el pipeline completo
-        mlflow.log_params(study.best_params)  # Guarda los hiperparámetros finales
+        mlflow.sklearn.log_model(pipeline, "model")               # Guarda pipeline en MLflow
+        mlflow.log_params(study.best_params)                      # Guarda hiperparámetros óptimos
         final_rmse = mean_squared_error(y_test, pipeline.predict(X_test)) ** 0.5
-        mlflow.log_metric("final_rmse", final_rmse)  # Guarda el RMSE final
+        mlflow.log_metric("final_rmse", final_rmse)               # Guarda RMSE final
+
+    # Guardar pipeline como archivo .pkl en /model para FastAPI y Docker
+    joblib.dump(pipeline, os.path.join(MODEL_DIR, "model.pkl"))
+    print(f"Modelo guardado en {MODEL_DIR}/model.pkl")  # Confirmación
