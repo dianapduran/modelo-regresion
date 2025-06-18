@@ -1,0 +1,14 @@
+artifact_uri: file:///d:/OneDrive%20-%20Landers/Documentos/Curso%20Python/parte_2/Sln_PublicarModelodeRegresion/mlruns/628789859270910743/a619c2c60ac24f949846f9ce4b4b8cd9/artifacts
+end_time: 1750257381481
+entry_point_name: ''
+experiment_id: '628789859270910743'
+lifecycle_stage: active
+run_id: a619c2c60ac24f949846f9ce4b4b8cd9
+run_name: dashing-stoat-251
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750257381305
+status: 3
+tags: []
+user_id: dduran

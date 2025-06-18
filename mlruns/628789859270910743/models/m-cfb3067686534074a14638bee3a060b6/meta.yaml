@@ -1,0 +1,10 @@
+artifact_location: file:///d:/OneDrive%20-%20Landers/Documentos/Curso%20Python/parte_2/Sln_PublicarModelodeRegresion/mlruns/628789859270910743/models/m-cfb3067686534074a14638bee3a060b6/artifacts
+creation_timestamp: 1750256368338
+experiment_id: '628789859270910743'
+last_updated_timestamp: 1750256376050
+model_id: m-cfb3067686534074a14638bee3a060b6
+model_type: null
+name: model
+source_run_id: 389d5de51a684a629416b81e5dc287f1
+status: 2
+status_message: null

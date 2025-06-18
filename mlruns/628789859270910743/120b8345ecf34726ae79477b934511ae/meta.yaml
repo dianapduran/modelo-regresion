@@ -1,0 +1,14 @@
+artifact_uri: file:///d:/OneDrive%20-%20Landers/Documentos/Curso%20Python/parte_2/Sln_PublicarModelodeRegresion/mlruns/628789859270910743/120b8345ecf34726ae79477b934511ae/artifacts
+end_time: 1750256360236
+entry_point_name: ''
+experiment_id: '628789859270910743'
+lifecycle_stage: active
+run_id: 120b8345ecf34726ae79477b934511ae
+run_name: colorful-zebra-390
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750256360078
+status: 3
+tags: []
+user_id: dduran
